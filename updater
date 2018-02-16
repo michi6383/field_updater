@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly SCRIPT_NAME=$(basename $0)
+
+function get_latest_github_release {
+  curl -s https://api.github.com/repos/SemkoDev/field.cli/releases | awk '/tag_name/{print $2}' | tr -d '"v,' | head -n 1
+}
+
+function get_installed_version {
+  field -V
+}
+
+log() {
+  echo "$@"
+  logger -p user.notice -t $SCRIPT_NAME "$@"
+}
+
+function update_field {
+	log "New field.cli release $latest detected! Updating installed version $installed to the latest release $latest"
+	pm2 stop field
+	npm install -g field.cli@$latest
+	pm2 start field
+	field -V
+}
+
+function v_is_digit {
+  tr -cd 0-9 <<<"$@"
+}
+
+function main {
+  local latest="$(get_latest_github_release)"
+  local installed="$(get_installed_version)"
+
+  if [ "$latest" != "$installed" ] && [ $(v_is_digit ${latest}) ] && [ $(v_is_digit ${installed}) ]; then
+    update_field
+  fi
+}
+
+main
