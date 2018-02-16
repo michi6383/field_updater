@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#carrIOTA field autoupdater
+#carrIOTA field update autoupdater
 #https://github.com/SemkoDev/field.cli/releases
 #echo '*/15 * * * * root bash -c "bash <(curl -s https://raw.githubusercontent.com/michi6383/field_updater/master/updater"' | sudo tee /etc/cron.d/field_updater > /dev/null
 
@@ -36,7 +36,7 @@ function main {
   local latest="$(get_latest_github_release)"
   local installed="$(get_installed_version)"
 
-  if [ "$latest" != "$installed" ] && [ $(v_is_digit ${latest}) ] && [ $(v_is_digit ${installed}) ]; then
+  if (( $(awk 'BEGIN {print ("'$latest'" > "'$installed'")}') )); then
     update_field
   fi
 }
