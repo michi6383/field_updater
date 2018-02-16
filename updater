@@ -28,10 +28,6 @@ function update_field {
 	field -V
 }
 
-function v_is_digit {
-  tr -cd 0-9 <<<"$@"
-}
-
 function main {
   local latest="$(get_latest_github_release)"
   local installed="$(get_installed_version)"
